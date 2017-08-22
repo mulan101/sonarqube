@@ -76,7 +76,7 @@ public class RestClient {
 	    
 	    String sProjectName = sComponentRoots.replaceAll(":", "-");
 	        
-		File file = new File(System.getProperty("user.dir") + "\\output\\sonarqube_result_" + sProjectName + "_" + sdf.format(d) + ".xlsx");
+		File file = new File(System.getProperty("user.dir") + "/output/sonarqube_result_" + sProjectName + "_" + sdf.format(d) + ".xlsx");
 		XSSFExcelWriter writer = new XSSFExcelWriter();
 		writer.createSheet(sProjectName);
 		writer.setColumn(0, "project", "project", 5000);
