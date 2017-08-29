@@ -71,12 +71,24 @@ public class RestClient {
 		Double iPs = (Double) getPageMap.get("ps");
 		int iLoop = (int) (Math.ceil(iTotal / iPs) + 1);
 		
-		Date d = new Date();
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
-	    
 	    String sProjectName = sComponentRoots.replaceAll(":", "-");
+	    String folderName = System.getProperty("user.dir") + "/output/" + Util.getDate("yyyyMMdd");
+	    
+	    File mkFolder = new File(folderName);
+	    
+	    if(!mkFolder.exists()){
+	    	mkFolder.mkdirs(); 
+	    } 
+	    
+	    /**
+	     else{
+   			File[] destroy = mkFolder.listFiles(); 
+   			for(File des : destroy){
+    			des.delete(); 
+   			}	
+   		}*/
 	        
-		File file = new File(System.getProperty("user.dir") + "/output/sonarqube_result_" + sProjectName + "_" + sdf.format(d) + ".xlsx");
+		File file = new File(folderName + "/sonarqube_result_" + sProjectName + "_" + Util.getDate("yyyyMMddhhmmss") + ".xlsx");
 		XSSFExcelWriter writer = new XSSFExcelWriter();
 		writer.createSheet(sProjectName);
 		writer.setColumn(0, "project", "project", 5000);
