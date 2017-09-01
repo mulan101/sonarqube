@@ -21,16 +21,16 @@ public class RestClient {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RestClient.class);
 	
-	public Map<String, Object> restCall(String sUrl, String sComponentRoots, int iPage) {
+	public Map<String, Object> restCall(String sUrl, String sComponentRoots, String sSeverities, int iPage) {
 		URL url = null;
 		HttpURLConnection conn = null;
 		Map<String, Object> responseBean = null;
 		try {
-			if (sUrl == null || sComponentRoots == null || iPage <= 0) {
-				throw new RuntimeException("Failed : Url/ComponentRoots/TotalPage not found");
+			if (sUrl == null || sComponentRoots == null || sSeverities == null||  iPage <= 0) {
+				throw new RuntimeException("Failed : Url/ComponentRoots/Severities/TotalPage not found");
 			}
 			LOG.info("sonarqube server call....");
-			url = new URL(sUrl + "?componentRoots=" + sComponentRoots + "&pageIndex=" + iPage);
+			url = new URL(sUrl + "?componentRoots=" + sComponentRoots + "&severities=" + sSeverities + "&pageIndex=" + iPage);
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
@@ -60,9 +60,9 @@ public class RestClient {
 		return responseBean;
 	}
 	
-	public void process(String sUrl, String sComponentRoots) {
+	public void process(String sUrl, String sComponentRoots, String sSeverities) {
 		
-		Map<String, Object> getPageMap = restCall(sUrl, sComponentRoots, 1);
+		Map<String, Object> getPageMap = restCall(sUrl, sComponentRoots,sSeverities, 1);
 		if (getPageMap == null) {
 			throw new RuntimeException("Error001 : response error");
 		}
@@ -91,19 +91,20 @@ public class RestClient {
 		File file = new File(folderName + "/sonarqube_result_" + sProjectName + "_" + Util.getDate("yyyyMMddhhmmss") + ".xlsx");
 		XSSFExcelWriter writer = new XSSFExcelWriter();
 		writer.createSheet(sProjectName);
-		writer.setColumn(0, "project", "project", 5000);
-		writer.setColumn(1, "severity", "severity", 5000);
-		writer.setColumn(2, "type", "type", 5000);
-		writer.setColumn(3, "rule", "rule", 8000);
-		writer.setColumn(4, "status", "status", 3000);
-		writer.setColumn(5, "resolution", "resolution", 3000);		
-		writer.setColumn(6, "component", "component", 10000);
-		writer.setColumn(7, "line", "line", 1000);
-		writer.setColumn(8, "message", "message", 10000);
+		writer.setColumn(0, "severity", "severity", 5000);
+		writer.setColumn(1, "type", "type", 5000);
+		writer.setColumn(2, "rule", "rule", 8000);
+		writer.setColumn(3, "status", "status", 3000);
+		writer.setColumn(4, "resolution", "resolution", 3000);
+		writer.setColumn(5, "createDate", "createDate", 3000);
+		writer.setColumn(6, "updateDate", "updateDate", 3000);
+		writer.setColumn(7, "component", "component", 10000);
+		writer.setColumn(8, "line", "line", 1000);
+		writer.setColumn(9, "message", "message", 10000);
 		writer.setHeaderToFirstRow();
 		LOG.info("excel write start...");
 		for(int i = 1 ; i < iLoop ; i++ ) {
-			Map<String, Object> responseMap = restCall(sUrl, sComponentRoots, i);
+			Map<String, Object> responseMap = restCall(sUrl, sComponentRoots, sSeverities, i);
 			if (responseMap == null) {
 				throw new RuntimeException("Error00" + i + " : response error");
 			}
@@ -119,13 +120,12 @@ public class RestClient {
 	}
 
 	public static void main(String[] args) {
-		if(args.length != 2) {
+		if(args.length != 3) {
 			throw new RuntimeException("Error000 : parameter not found");
 		}		
 		
 		RestClient rc = new RestClient();
-		rc.process(args[0],args[1]);
+		rc.process(args[0],args[1],args[2]);
 
 	}
-
 }
